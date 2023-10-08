@@ -1,24 +1,29 @@
 package quiz
 
 import (
+	"bufio"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/milkymilky0116/gophercises-practice/01_quiz_game/cli"
 )
 
 type Quiz struct {
-	quiz   map[string]string
-	result int
+	Quiz   map[string]string
+	Result int
+	index  int
 	config cli.Config
 }
 
 func ParseCsv(filename string, config cli.Config) (*Quiz, error) {
 	var q Quiz
-	q.quiz = map[string]string{}
+	q.Quiz = map[string]string{}
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -29,39 +34,38 @@ func ParseCsv(filename string, config cli.Config) (*Quiz, error) {
 	if err != nil {
 		return nil, err
 	}
+	r, _ := regexp.Compile("[0-9]+")
 	for _, row := range data {
-		q.quiz[row[0]] = row[1]
+		q.Quiz[row[0]] = strings.TrimSpace(r.FindString(row[1]))
 	}
 	q.config = config
-
 	return &q, nil
 }
 
 func (q *Quiz) ParseUserInput() (*Quiz, error) {
-	for question, answer := range q.quiz {
+	q.index = 1
+	for question, answer := range q.Quiz {
 		var userAnswer int
-		outputQuestion := fmt.Sprintf("\nQuestion : %s ?\n", question)
 
 		channel := make(chan bool)
+		errs := make(chan error, 1)
+		outputQuestion := fmt.Sprintf("Problem #%d %s : ", q.index, question)
 
-		go func(done chan bool) {
-			timer := q.config.Timer
-			fmt.Println(outputQuestion)
-
-			fmt.Print("Type Your Answer : ")
-			fmt.Scan(&userAnswer)
-
-			for i := 0; i < timer; i++ {
-				time.Sleep(1 * time.Second)
-				saveCursorPosition := "\033[s"
-				fmt.Print(saveCursorPosition)
-				fmt.Print(i)
+		go func() {
+			fmt.Print(outputQuestion)
+			reader := bufio.NewReader(os.Stdin)
+			result, err := reader.ReadString('\n')
+			if err != nil {
+				errs <- err
 			}
-			clearLine := "\033[u\033[K"
-			fmt.Print(clearLine)
+			result = result[:len(result)-1]
+			userAnswer, err = strconv.Atoi(result)
+			if err != nil {
+				errs <- err
+			}
+			channel <- true
+		}()
 
-			done <- true
-		}(channel)
 		timeoutChan := time.After(time.Duration(q.config.Timer) * time.Second)
 		select {
 		case <-channel:
@@ -69,12 +73,14 @@ func (q *Quiz) ParseUserInput() (*Quiz, error) {
 			if err != nil {
 				return nil, err
 			}
-
 			if userAnswer == parsedAnswer {
-				q.result++
+				q.Result++
 			}
+			q.index++
+
 		case <-timeoutChan:
-			fmt.Println("\n\nOops! Timeout!")
+			err := errors.New("timeout exceed")
+			return q, err
 		}
 
 	}

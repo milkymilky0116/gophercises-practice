@@ -20,8 +20,12 @@ func main() {
 		log.Println(err)
 	}
 	result, err := questions.ParseUserInput()
-	fmt.Println(result)
+
 	if err != nil {
 		log.Println(err)
 	}
+
+	resultOutput := fmt.Sprintf("You scored %d out of %d", result.Result, len(result.Quiz))
+
+	fmt.Println(resultOutput)
 }
