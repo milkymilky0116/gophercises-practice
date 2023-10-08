@@ -1,0 +1,12 @@
+{
+    "urls":[
+        {
+            "path":"/naver",
+            "url":"https://naver.com"
+        },
+        {
+            "path":"/google",
+            "url":"https://google.com"
+        }
+    ]
+}
