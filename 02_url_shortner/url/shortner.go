@@ -20,8 +20,10 @@ type url struct {
 
 func (app *AppConfig) MapHandler(pathsToUrls map[string]string) {
 	for url, redirect := range pathsToUrls {
-		app.Mux.HandleFunc(url, func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, redirect, http.StatusPermanentRedirect)
+		newUrl := url
+		newRedirect := redirect
+		app.Mux.HandleFunc(newUrl, func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, newRedirect, http.StatusPermanentRedirect)
 		})
 	}
 }
@@ -33,10 +35,11 @@ func (app *AppConfig) YAMLHandler(yml []byte) error {
 		return err
 	}
 	for _, config := range u {
-		app.Mux.HandleFunc(config.Path, func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, config.Url, http.StatusPermanentRedirect)
+		path := config.Path
+		url := config.Url
+		app.Mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, url, http.StatusPermanentRedirect)
 		})
-
 	}
 	return nil
 }
@@ -49,9 +52,10 @@ func (app *AppConfig) JsonHandler(jsonBuff []byte) error {
 	}
 	fmt.Println(u)
 	for _, config := range u.Urls {
-		fmt.Println(config.Path, config.Url)
-		app.Mux.HandleFunc(config.Path, func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, config.Url, http.StatusPermanentRedirect)
+		path := config.Path
+		url := config.Url
+		app.Mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, url, http.StatusPermanentRedirect)
 		})
 	}
 	return nil

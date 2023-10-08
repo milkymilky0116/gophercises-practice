@@ -6,27 +6,30 @@ import (
 	"os"
 
 	"github.com/milkymilky0116/gophercises-practice/02_url_shortner/cli"
+	"github.com/milkymilky0116/gophercises-practice/02_url_shortner/db"
 	urlshortner "github.com/milkymilky0116/gophercises-practice/02_url_shortner/url"
 )
 
 func main() {
+	db, err := db.InitDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	app := urlshortner.AppConfig{
 		Mux: http.NewServeMux(),
+		DB:  db,
 	}
 	pathsToUrls := map[string]string{
 		"/urlshort-godoc": "https://godoc.org/github.com/gophercises/urlshort",
 		"/yaml-godoc":     "https://godoc.org/gopkg.in/yaml.v2",
 	}
-	// 	yaml := `- path: /urlshort
-	//   url: https://github.com/gophercises/urlshort
-	// - path: /urlshort-final
-	//   url: https://github.com/gophercises/urlshort/tree/solution
-	// `
-	app.MapHandler(pathsToUrls)
 	config, err := cli.ParseArgs(os.Args[1:])
 	if err != nil {
 		log.Fatal(err)
 	}
+	app.MapHandler(pathsToUrls)
+
 	ymlfileBuff, err := cli.OpenFile(config.Ymlfile)
 	if err != nil {
 		log.Fatal(err)

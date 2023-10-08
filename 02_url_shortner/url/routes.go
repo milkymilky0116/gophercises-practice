@@ -3,10 +3,13 @@ package urlshortner
 import (
 	"fmt"
 	"net/http"
+
+	"go.etcd.io/bbolt"
 )
 
 type AppConfig struct {
 	Mux *http.ServeMux
+	DB  *bbolt.DB
 }
 
 func (app *AppConfig) Run() *http.ServeMux {
