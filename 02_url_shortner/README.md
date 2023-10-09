@@ -5,4 +5,4 @@
 - exercise [✅]
 - Bonus 1 : YAML File flag [✅]
 - Bonus 2 : JSON Handler [✅]
-- Bonus 3 : DB Handler []
+- Bonus 3 : DB Handler [✅]
