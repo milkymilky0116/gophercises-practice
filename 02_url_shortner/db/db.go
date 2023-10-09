@@ -6,8 +6,8 @@ type App struct {
 	DB *bbolt.DB
 }
 
-func InitDB() (*bbolt.DB, error) {
-	db, err := bbolt.Open("url-shortner.db", 0600, nil)
+func InitDB(dbname string) (*bbolt.DB, error) {
+	db, err := bbolt.Open(dbname, 0600, nil)
 	if err != nil {
 		return nil, err
 	}
