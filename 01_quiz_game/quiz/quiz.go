@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -45,7 +44,7 @@ func ParseCsv(filename string, config cli.Config) (*Quiz, error) {
 func (q *Quiz) ParseUserInput() (*Quiz, error) {
 	q.index = 1
 	for question, answer := range q.Quiz {
-		var userAnswer int
+		var userAnswer string
 
 		channel := make(chan bool)
 		errs := make(chan error, 1)
@@ -59,7 +58,7 @@ func (q *Quiz) ParseUserInput() (*Quiz, error) {
 				errs <- err
 			}
 			result = result[:len(result)-1]
-			userAnswer, err = strconv.Atoi(result)
+			userAnswer = strings.TrimSpace(result)
 			if err != nil {
 				errs <- err
 			}
@@ -69,11 +68,9 @@ func (q *Quiz) ParseUserInput() (*Quiz, error) {
 		timeoutChan := time.After(time.Duration(q.config.Timer) * time.Second)
 		select {
 		case <-channel:
-			parsedAnswer, err := strconv.Atoi(answer)
-			if err != nil {
-				return nil, err
-			}
-			if userAnswer == parsedAnswer {
+			userAnswer = strings.ToLower(userAnswer)
+			answer = strings.ToLower(answer)
+			if userAnswer == answer {
 				q.Result++
 			}
 			q.index++
