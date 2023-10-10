@@ -1,9 +1,0 @@
-{{define "title"}} {{.Story.Title}} {{end}} {{define "main"}} {{with .Story}}
-<h1>{{.Title}}</h1>
-{{range .Story}}
-<p>{{indentation .}}</p>
-{{end}} {{range .Options}}
-<ul>
-  <li><a href="/view?arc={{.Arc}}"> {{.Text}}</a></li>
-</ul>
-{{end}} {{end}} {{end}}

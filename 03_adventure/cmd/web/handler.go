@@ -16,7 +16,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 	data := newTemplateData(r)
 	data.Story = intro
-	app.render(w, "view.tmpl.html", data, http.StatusOK)
+	app.render(w, "view.tmpl.gohtml", data, http.StatusOK)
 }
 
 func (app *application) view(w http.ResponseWriter, r *http.Request) {
@@ -30,5 +30,5 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 
 	data := newTemplateData(r)
 	data.Story = page
-	app.render(w, "view.tmpl.html", data, http.StatusOK)
+	app.render(w, "view.tmpl.gohtml", data, http.StatusOK)
 }
