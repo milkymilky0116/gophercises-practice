@@ -1,16 +1,13 @@
-package web
+package main
 
 import (
-	"fmt"
 	"net/http"
-
-	"github.com/julienschmidt/httprouter"
 )
 
-func Home(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	fmt.Fprint(w, "Home")
-}
-func (app *Application) Routes() *httprouter.Router {
-	app.Router.GET("/", Home)
-	return app.Router
+func (app *application) routes() *http.ServeMux {
+	fileServer := http.FileServer(http.Dir("./ui/static"))
+	app.mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
+	app.mux.HandleFunc("/", app.home)
+	app.mux.HandleFunc("/view", app.view)
+	return app.mux
 }

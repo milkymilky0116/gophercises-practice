@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -16,6 +17,10 @@ type Option struct {
 	Arc  string `json:"arc"`
 }
 
+type AdventureModel struct {
+	Stories map[string]*AdventureStory
+}
+
 func OpenFile(filename string) ([]byte, error) {
 	file, err := os.ReadFile(filename)
 	if err != nil {
@@ -23,15 +28,24 @@ func OpenFile(filename string) ([]byte, error) {
 	}
 	return file, nil
 }
-func ParseJson(filename string) (map[string]AdventureStory, error) {
+func ParseJson(filename string) (map[string]*AdventureStory, error) {
 	buff, err := OpenFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	result := make(map[string]AdventureStory)
+	result := make(map[string]*AdventureStory)
 	err = json.Unmarshal(buff, &result)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
+}
+
+func (m *AdventureModel) Get(arc string) (*AdventureStory, error) {
+	page, ok := m.Stories[arc]
+	if !ok {
+		err := fmt.Errorf("the story arc %s is not exists", arc)
+		return nil, err
+	}
+	return page, nil
 }

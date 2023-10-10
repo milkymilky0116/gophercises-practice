@@ -1,0 +1,14 @@
+main {
+  margin: 20%;
+  padding: 30px;
+  border: 1px solid grey;
+  border-radius: 10px;
+  font-family: "Tilt Neon", cursive;
+  /* font-family: "Titillium Web", sans-serif; */
+}
+main h1 {
+  color: lightblue;
+}
+main p {
+  line-height: 30px;
+}
